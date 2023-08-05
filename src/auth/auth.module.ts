@@ -7,9 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { SessionsModule } from 'src/sessions/sessions.module';
 
 @Module({
-  imports: [UsersModule, SessionsModule, JwtModule.register({
-
-  })],
+  imports: [UsersModule, SessionsModule, JwtModule.register({})],
   controllers: [AuthController],
   providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy]
 })

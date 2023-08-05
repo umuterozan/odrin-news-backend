@@ -1,6 +1,7 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Req } from '@nestjs/common';
 import { SignUpDto, SignInDto } from './dto';
 import { AuthService } from './auth.service';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -19,13 +20,21 @@ export class AuthController {
     return await this.authService.signIn(dto);
   }
 
-  @Post('logout')
-  async logout() {
-    this.authService.logout();
+  @Post('logout-current')
+  async logoutCurrent(@Req() req: Request) {
+    const user = req.user
+    return await this.authService.logoutCurrent(user['sessionId']);
+  }
+
+  @Post('logout-all')
+  async logoutAll(@Req() req: Request) {
+    const user = req.user
+    return await this.authService.logoutAll(user['sub'])
   }
 
   @Post('refresh')
-  async refreshTokens() {
-    this.authService.refreshTokens();
+  async refreshTokens(@Req() req: Request) {
+    const user = req.user
+    return await this.authService.refreshTokens(user['sessionId'], user['refreshToken']);
   }
 }

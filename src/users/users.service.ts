@@ -13,10 +13,10 @@ export class UsersService {
 
   async create(dto: SignUpDto) {
     const newUser = this.usersRepository.create(dto);
-    return this.usersRepository.save(newUser);
+    return await this.usersRepository.save(newUser);
   }
 
-  findOne(criteria: object) {
-    return this.usersRepository.findOneBy(criteria);
+  async findOne(criteria: object) {
+    return await this.usersRepository.findOneBy(criteria);
   }
 }

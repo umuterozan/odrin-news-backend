@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignUpDto, SignInDto } from './dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -16,7 +16,7 @@ export class AuthService {
 
   async signUp(dto: SignUpDto) {
     dto.password = await this.hashData(dto.password);
-    return this.usersService.create(dto);
+    return await this.usersService.create(dto);
   }
 
   async signIn(dto: SignInDto) {
@@ -25,29 +25,29 @@ export class AuthService {
     const matched = await bcrypt.compare(dto.password, user.password);
     if (!matched) throw new UnauthorizedException('Password incorrect');
 
-    const tokens = await this.generateTokens(user.id);
-    const session = await this.sessionsService.create(dto.agent, tokens.refreshToken, user);
-    return {
-      tokens,
-      session: {
-        id: session.id,
-      },
-      user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username: user.username,
-        email: user.email,
-      }
-    }
+    const session = await this.sessionsService.create(dto.agent, user);
+    const tokens = await this.generateTokens(user.id, user.username, session.id);
+    const hash = await this.hashData(tokens.refreshToken)
+    await this.sessionsService.updateRtHash(session.id, hash)
+
+    return tokens;
   }
 
-  logout() {}
+  async logoutCurrent(sessionId: number) {
+    return await this.sessionsService.deleteOneById(sessionId)
+  }
 
-  async generateTokens(userId: number): Promise<ITokens> {
+  async logoutAll(userId: number) {
+    return await this.sessionsService.deleteAllByUserId(userId)
+  }
+
+  async generateTokens(userId: number, username: string, sessionId: number): Promise<ITokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
           sub: userId,
+          username,
+          sessionId,
         },
         {
           secret:
@@ -58,6 +58,8 @@ export class AuthService {
       this.jwtService.signAsync(
         {
           sub: userId,
+          username,
+          sessionId,
         },
         {
           secret:
@@ -73,9 +75,20 @@ export class AuthService {
     }
   }
 
-  refreshTokens() {}
+  async refreshTokens(sessionId: number, refreshToken: string) {
+    const session = await this.sessionsService.findOne({ id: sessionId });
+    if (!session) throw new ForbiddenException('Session does not exist');
+    const matched = await bcrypt.compare(refreshToken, session.hash);
+    if (!matched) throw new ForbiddenException('Tokens does not match');
 
-  hashData(data: string) {
-    return bcrypt.hash(data, 10);
+    const tokens = await this.generateTokens(session.user.id, session.user.username, session.id);
+    const hash = await this.hashData(tokens.refreshToken)
+    await this.sessionsService.updateRtHash(session.id, hash)
+
+    return tokens;
+  }
+
+  async hashData(data: string) {
+    return await bcrypt.hash(data, 10);
   }
 }

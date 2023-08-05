@@ -10,13 +10,40 @@ export class SessionsService {
     private sessionsRepository: Repository<SessionEntity>
   ) {}
 
-  create(agent: string, hash: string, user: UserEntity) {
+  async create(agent: string, user: UserEntity) {
     const newSession = this.sessionsRepository.create({
       agent,
-      hash,
       user,
     })
 
-    return this.sessionsRepository.save(newSession)
+    return await this.sessionsRepository.save(newSession)
+  }
+
+  async updateRtHash(id: number, hash: string) {
+    await this.sessionsRepository.update({
+      id
+    }, {
+      hash
+    })
+  }
+
+  async findOne(criteria: object) {
+    return await this.sessionsRepository.findOneBy(criteria);
+  }
+
+  async deleteOneById(id: number) {
+    await this.sessionsRepository.delete({ id })
+
+    return { message: 'Current session succesfully deleted' }
+  }
+
+  async deleteAllByUserId(id: number) {
+    await this.sessionsRepository.delete({
+      user: {
+        id,
+      }
+    })
+
+    return { message: "User's all sessions succesfully deleted" }
   }
 }
