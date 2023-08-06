@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Req } from '@nestjs/common';
+import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
 import { SignUpDto, SignInDto } from './dto';
 import { AuthService } from './auth.service';
-import { Request } from 'express';
+import { AccessTokenGuard, RefreshTokenGuard } from 'src/common/guards';
+import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -20,21 +21,21 @@ export class AuthController {
     return await this.authService.signIn(dto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('logout-current')
-  async logoutCurrent(@Req() req: Request) {
-    const user = req.user
-    return await this.authService.logoutCurrent(user['sessionId']);
+  async logoutCurrent(@GetCurrentUser('sessionId') sessionId: number) {
+    return await this.authService.logoutCurrent(sessionId);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('logout-all')
-  async logoutAll(@Req() req: Request) {
-    const user = req.user
-    return await this.authService.logoutAll(user['sub'])
+  async logoutAll(@GetCurrentUser('sub') userId: number) {
+    return await this.authService.logoutAll(userId)
   }
 
+  @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  async refreshTokens(@Req() req: Request) {
-    const user = req.user
-    return await this.authService.refreshTokens(user['sessionId'], user['refreshToken']);
+  async refreshTokens(@GetCurrentUser('sessionId') sessionId: number, @GetCurrentUser('refreshToken') refreshToken: string) {
+    return await this.authService.refreshTokens(sessionId, refreshToken);
   }
 }
