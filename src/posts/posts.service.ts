@@ -11,11 +11,13 @@ export class PostsService {
   constructor(
     @InjectRepository(PostEntity)
     private postsRepository: Repository<PostEntity>,
-    private usersService: UsersService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private usersService: UsersService
   ) {}
 
-  findAll() {}
+  async findOne(criteria: object) {
+    return await this.postsRepository.findOneBy(criteria)
+  }
 
   async create(dto: CreatePostDto, userId: number) {
     const slug = this.generateSlug(dto.title)
@@ -29,6 +31,7 @@ export class PostsService {
       category,
       user,
     })
+    
     return await this.postsRepository.save(newPost)
   }
 

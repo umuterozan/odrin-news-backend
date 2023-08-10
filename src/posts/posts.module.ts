@@ -9,6 +9,7 @@ import { CategoriesModule } from 'src/categories/categories.module';
 @Module({
   imports: [CategoriesModule, UsersModule, TypeOrmModule.forFeature([PostEntity])],
   controllers: [PostsController],
-  providers: [PostsService]
+  providers: [PostsService],
+  exports: [PostsService],
 })
 export class PostsModule {}

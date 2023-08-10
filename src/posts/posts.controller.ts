@@ -9,10 +9,6 @@ export class PostsController {
   constructor(private postsService: PostsService) {}
 
   @UseGuards(AccessTokenGuard)
-  @Get()
-  getPosts() {}
-
-  @UseGuards(AccessTokenGuard)
   @Post('create')
   async createPost(@Body() dto: CreatePostDto, @GetCurrentUser('sub') userId: number) {
     const post = await this.postsService.create(dto, userId);
