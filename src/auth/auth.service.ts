@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { SessionsService } from 'src/sessions/sessions.service';
 import { ITokens } from './interfaces/tokens.interface';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +28,7 @@ export class AuthService {
 
     const session = await this.sessionsService.create(dto.agent, user);
     const tokens = await this.generateTokens(user.id, user.username, session.id);
-    const hash = await this.hashData(tokens.refreshToken)
+    const hash = await this.hashData(this.sha256(tokens.refreshToken))
     await this.sessionsService.updateRtHash(session.id, hash)
 
     return tokens;
@@ -75,14 +76,14 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(sessionId: number, refreshToken: string) {
+  async refreshTokens(userId: number, username: string, sessionId: number, refreshToken: string) {
     const session = await this.sessionsService.findOne({ id: sessionId });
-    if (!session) throw new ForbiddenException('Session does not exist');
-    const matched = await bcrypt.compare(refreshToken, session.hash);
+    if (!session) throw new ForbiddenException('Session does not exist');    
+    const matched = await bcrypt.compare(this.sha256(refreshToken), session.hash);
     if (!matched) throw new ForbiddenException('Tokens does not match');
 
-    const tokens = await this.generateTokens(session.user.id, session.user.username, session.id);
-    const hash = await this.hashData(tokens.refreshToken)
+    const tokens = await this.generateTokens(userId, username, session.id);
+    const hash = await this.hashData(this.sha256(tokens.refreshToken))
     await this.sessionsService.updateRtHash(session.id, hash)
 
     return tokens;
@@ -90,5 +91,9 @@ export class AuthService {
 
   async hashData(data: string) {
     return await bcrypt.hash(data, 10);
+  }
+
+  sha256(data: string) {
+    return createHash('sha256').update(data).digest('hex');
   }
 }

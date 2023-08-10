@@ -12,6 +12,6 @@ export class SignInDto {
   password: string;
 
   @IsString()
-  @Length(1, 150)
+  @Length(1, 300)
   agent: string;
 }

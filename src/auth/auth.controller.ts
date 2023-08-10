@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { SignUpDto, SignInDto } from './dto';
 import { AuthService } from './auth.service';
 import { AccessTokenGuard, RefreshTokenGuard } from 'src/common/guards';
@@ -10,8 +10,8 @@ export class AuthController {
 
   @Post('signup')
   async signUp(@Body() dto: SignUpDto) {
-    await this.authService.signUp(dto);
-    return {
+    const user = await this.authService.signUp(dto);
+    if (user) return {
       success: true,
     }
   }
@@ -35,7 +35,7 @@ export class AuthController {
 
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  async refreshTokens(@GetCurrentUser('sessionId') sessionId: number, @GetCurrentUser('refreshToken') refreshToken: string) {
-    return await this.authService.refreshTokens(sessionId, refreshToken);
+  async refreshTokens(@GetCurrentUser('sub') userId: number, @GetCurrentUser('username') username: string, @GetCurrentUser('sessionId') sessionId: number, @GetCurrentUser('refreshToken') refreshToken: string) {
+    return await this.authService.refreshTokens(userId, username, sessionId, refreshToken);
   }
 }

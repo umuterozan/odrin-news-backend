@@ -9,6 +9,6 @@ import { SessionsModule } from 'src/sessions/sessions.module';
 @Module({
   imports: [UsersModule, SessionsModule, JwtModule.register({})],
   controllers: [AuthController],
-  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy]
+  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
 })
 export class AuthModule {}
