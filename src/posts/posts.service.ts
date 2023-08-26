@@ -15,8 +15,12 @@ export class PostsService {
     private usersService: UsersService
   ) {}
 
-  async findOne(criteria: object) {
+  async findOne(criteria: Object) {
     return await this.postsRepository.findOneBy(criteria)
+  }
+
+  async find(options: Object) {
+    return await this.postsRepository.find(options)
   }
 
   async create(dto: CreatePostDto, userId: number) {

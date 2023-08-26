@@ -16,7 +16,7 @@ export class UsersService {
     return await this.usersRepository.save(newUser);
   }
 
-  async findOne(criteria: object) {
+  async findOne(criteria: Object) {
     return await this.usersRepository.findOneBy(criteria);
   }
 }

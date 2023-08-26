@@ -27,7 +27,7 @@ export class AuthService {
     if (!matched) throw new UnauthorizedException('Password incorrect');
 
     const session = await this.sessionsService.create(dto.agent, user);
-    const tokens = await this.generateTokens(user.id, user.username, session.id);
+    const tokens = await this.generateTokens(user.id, user.username, user.isAdmin, session.id);
     const hash = await this.hashData(this.sha256(tokens.refreshToken))
     await this.sessionsService.updateRtHash(session.id, hash)
 
@@ -42,12 +42,13 @@ export class AuthService {
     return await this.sessionsService.deleteAllByUserId(userId)
   }
 
-  async generateTokens(userId: number, username: string, sessionId: number): Promise<ITokens> {
+  async generateTokens(userId: number, username: string, isAdmin: boolean, sessionId: number): Promise<ITokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
           sub: userId,
           username,
+          isAdmin,
           sessionId,
         },
         {
@@ -60,6 +61,7 @@ export class AuthService {
         {
           sub: userId,
           username,
+          isAdmin,
           sessionId,
         },
         {
@@ -76,13 +78,15 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(userId: number, username: string, sessionId: number, refreshToken: string) {
+  async refreshTokens(sessionId: number, refreshToken: string) {
     const session = await this.sessionsService.findOne({ id: sessionId });
     if (!session) throw new ForbiddenException('Session does not exist');    
+    const user = await this.usersService.findOne({ sessions: { id: sessionId }})
+    if (!user) throw new ForbiddenException('User does not exist');
     const matched = await bcrypt.compare(this.sha256(refreshToken), session.hash);
     if (!matched) throw new ForbiddenException('Tokens does not match');
 
-    const tokens = await this.generateTokens(userId, username, session.id);
+    const tokens = await this.generateTokens(user.id, user.username, user.isAdmin, session.id);
     const hash = await this.hashData(this.sha256(tokens.refreshToken))
     await this.sessionsService.updateRtHash(session.id, hash)
 

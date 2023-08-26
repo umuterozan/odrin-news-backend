@@ -27,7 +27,7 @@ export class SessionsService {
     })
   }
 
-  async findOne(criteria: object) {
+  async findOne(criteria: Object) {
     return await this.sessionsRepository.findOneBy(criteria);
   }
 

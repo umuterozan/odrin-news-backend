@@ -3,16 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
 import { CategoriesModule } from './categories/categories.module';
-import { AdsModule } from './ads/ads.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentsModule } from './comments/comments.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity, SessionEntity, CategoryEntity, PostEntity, CommentEntity, AdEntity } from './typeorm/entities';
+import { UserEntity, SessionEntity, CategoryEntity, PostEntity, CommentEntity } from './typeorm/entities';
 import { SessionsModule } from './sessions/sessions.module';
 
 @Module({
-  imports: [PostsModule, CategoriesModule, AdsModule, AuthModule, CommentsModule, UsersModule,
+  imports: [PostsModule, CategoriesModule, AuthModule, CommentsModule, UsersModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -20,7 +19,7 @@ import { SessionsModule } from './sessions/sessions.module';
       username: 'postgres',
       password: 'admin',
       database: 'odrin_news',
-      entities: [UserEntity, SessionEntity, CategoryEntity, PostEntity, CommentEntity, AdEntity],
+      entities: [UserEntity, SessionEntity, CategoryEntity, PostEntity, CommentEntity],
       synchronize: true,
     }),
     SessionsModule

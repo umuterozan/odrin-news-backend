@@ -35,7 +35,7 @@ export class AuthController {
 
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  async refreshTokens(@GetCurrentUser('sub') userId: number, @GetCurrentUser('username') username: string, @GetCurrentUser('sessionId') sessionId: number, @GetCurrentUser('refreshToken') refreshToken: string) {
-    return await this.authService.refreshTokens(userId, username, sessionId, refreshToken);
+  async refreshTokens(@GetCurrentUser('sessionId') sessionId: number, @GetCurrentUser('refreshToken') refreshToken: string) {
+    return await this.authService.refreshTokens(sessionId, refreshToken);
   }
 }

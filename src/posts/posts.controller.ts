@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AccessTokenGuard } from 'src/common/guards';
@@ -15,6 +15,12 @@ export class PostsController {
     if (post) return {
       success: true,
     }
+  }
+
+  @Get()
+  async getPosts(@Query() query: Object) {
+    console.log(query)
+    //return await this.postsService.find()
   }
   
 }

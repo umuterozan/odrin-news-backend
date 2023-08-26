@@ -20,7 +20,7 @@ export class CategoriesService {
     return await this.categoriesRepository.find()
   }
 
-  async findOne(criteria: object) {
+  async findOne(criteria: Object) {
     return await this.categoriesRepository.findOneBy(criteria)
   }
 }

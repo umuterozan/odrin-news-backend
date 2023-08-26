@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { AccessTokenGuard } from 'src/common/guards';
+import { AccessTokenGuard, AdminGuard } from 'src/common/guards';
 
 @Controller('categories')
 export class CategoriesController {
@@ -13,6 +13,7 @@ export class CategoriesController {
     return await this.categoriesService.findAll();
   }
   
+  @UseGuards(AdminGuard)
   @UseGuards(AccessTokenGuard)
   @Post('create')
   async createCategory(@Body() dto: CreateCategoryDto) {
