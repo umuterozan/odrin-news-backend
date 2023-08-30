@@ -19,8 +19,22 @@ export class PostsService {
     return await this.postsRepository.findOneBy(criteria)
   }
 
-  async find(options: Object) {
-    return await this.postsRepository.find(options)
+  async find(limit: number, sort: string, order: 'ASC' | 'DESC') {
+    return await this.postsRepository.createQueryBuilder('posts')
+    .leftJoinAndSelect('posts.category', 'category')
+    .leftJoinAndSelect('posts.user', 'user')
+    .leftJoinAndSelect('posts.comments', 'comments')
+    .select(['posts.id', 'posts.thumbnail', 'posts.title', 'posts.body', 'posts.slug', 'posts.createdAt', 'category.id', 'category.name', 'user.id', 'user.username'])
+    .addSelect((subQuery) => {      
+      return subQuery
+        .select('COUNT(comments.id)', 'commentsCount')
+        .from('comments', 'comments')
+        .where('comments.post.id = posts.id')
+    }, 'count')
+    .orderBy(sort === 'count' ? sort : 'posts.id', order) //burda kaldı
+    .loadRelationCountAndMap('posts.commentsCount', 'posts.comments')
+    .take(limit)
+    .getMany();
   }
 
   async create(dto: CreatePostDto, userId: number) {

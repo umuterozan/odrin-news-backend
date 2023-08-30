@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Query, ParseIntPipe } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AccessTokenGuard } from 'src/common/guards';
@@ -18,9 +18,7 @@ export class PostsController {
   }
 
   @Get()
-  async getPosts(@Query() query: Object) {
-    console.log(query)
-    //return await this.postsService.find()
+  async getPosts(@Query('limit', ParseIntPipe) limit: number = 0, @Query('sort') sort: string = '', @Query('order') order: 'ASC' | 'DESC' = 'ASC') {
+    return await this.postsService.find(limit, sort, order)
   }
-  
 }
