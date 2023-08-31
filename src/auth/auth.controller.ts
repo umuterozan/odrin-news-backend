@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
 import { SignUpDto, SignInDto } from './dto';
 import { AuthService } from './auth.service';
 import { AccessTokenGuard, RefreshTokenGuard } from 'src/common/guards';
@@ -37,5 +37,11 @@ export class AuthController {
   @Post('refresh')
   async refreshTokens(@GetCurrentUser('sessionId') sessionId: number, @GetCurrentUser('refreshToken') refreshToken: string) {
     return await this.authService.refreshTokens(sessionId, refreshToken);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('verify-token')
+  async verifyToken(@GetCurrentUser() user: any) {
+    return user;
   }
 }
