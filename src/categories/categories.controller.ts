@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Query } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { AccessTokenGuard, AdminGuard } from 'src/common/guards';
@@ -6,12 +6,6 @@ import { AccessTokenGuard, AdminGuard } from 'src/common/guards';
 @Controller('categories')
 export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
-
-  @UseGuards(AccessTokenGuard)
-  @Get()
-  async getCategories() {
-    return await this.categoriesService.findAll();
-  }
   
   @UseGuards(AdminGuard)
   @UseGuards(AccessTokenGuard)
@@ -21,5 +15,11 @@ export class CategoriesController {
     if (category) return {
       success: true,
     }
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get()
+  async getCategories(@Query('limit') limit: number = 0, @Query('order') order: 'ASC' | 'DESC' = 'ASC') {
+    return await this.categoriesService.find(limit, order);
   }
 }

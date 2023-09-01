@@ -16,11 +16,16 @@ export class CategoriesService {
     return await this.categoriesRepository.save(newCategory)
   }
 
-  async findAll() {
-    return await this.categoriesRepository.find()
-  }
-
   async findOne(criteria: Object) {
     return await this.categoriesRepository.findOneBy(criteria)
+  }
+
+  async find(limit: number, orderType: 'ASC' | 'DESC') {
+    return await this.categoriesRepository.find({
+      take: limit,
+      order: {
+        id: orderType,
+      }
+    })
   }
 }
