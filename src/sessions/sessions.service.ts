@@ -34,7 +34,7 @@ export class SessionsService {
   async deleteOneById(id: number) {
     await this.sessionsRepository.delete({ id })
 
-    return { success: true }
+    return { message: 'successful' }
   }
 
   async deleteAllByUserId(id: number) {
@@ -44,6 +44,6 @@ export class SessionsService {
       }
     })
 
-    return { success: true }
+    return { message: 'successful' }
   }
 }

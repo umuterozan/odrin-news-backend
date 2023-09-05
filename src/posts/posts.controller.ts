@@ -13,7 +13,7 @@ export class PostsController {
   async createPost(@Body() dto: CreatePostDto, @GetCurrentUser('sub') userId: number) {
     const post = await this.postsService.create(dto, userId);
     if (post) return {
-      success: true,
+      message: 'successful',
     }
   }
 

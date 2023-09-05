@@ -13,7 +13,7 @@ export class CategoriesController {
   async createCategory(@Body() dto: CreateCategoryDto) {
     const category = await this.categoriesService.create(dto);
     if (category) return {
-      success: true,
+      message: 'successful',
     }
   }
 

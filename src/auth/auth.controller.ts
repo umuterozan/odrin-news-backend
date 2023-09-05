@@ -12,7 +12,7 @@ export class AuthController {
   async signUp(@Body() dto: SignUpDto) {
     const user = await this.authService.signUp(dto);
     if (user) return {
-      success: true,
+      message: 'successful',
     }
   }
 

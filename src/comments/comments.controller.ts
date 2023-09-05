@@ -13,7 +13,7 @@ export class CommentsController {
   async createComment(@Body() dto: CreateCommentDto, @GetCurrentUser('sub') userId: number) {
     const comment = await this.commentsService.create(dto, userId)
     if (comment) return {
-      success: true,
+      message: 'successful',
     }
   }
 }
