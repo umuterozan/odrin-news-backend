@@ -17,7 +17,6 @@ export class CategoriesController {
     }
   }
 
-  @UseGuards(AccessTokenGuard)
   @Get()
   async getCategories(@Query('limit') limit: number = 0, @Query('order') order: 'ASC' | 'DESC' = 'ASC') {
     return await this.categoriesService.find(limit, order);
