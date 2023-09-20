@@ -41,7 +41,7 @@ export class AuthController {
 
   @UseGuards(AccessTokenGuard)
   @Get('verify-token')
-  async verifyToken(@GetCurrentUser() user: any) {
-    return user;
+  async verifyToken() {
+    return true;
   }
 }

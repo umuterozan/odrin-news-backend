@@ -24,8 +24,8 @@ export class PostsService {
     .leftJoinAndSelect('posts.category', 'category')
     .leftJoinAndSelect('posts.user', 'user')
     .leftJoinAndSelect('posts.comments', 'comments')
-    .select(['posts.id', 'posts.thumbnail', 'posts.title', 'posts.body', 'posts.slug', 'posts.createdAt', 'category.id', 'category.name', 'user.id', 'user.username'])
-    .addSelect((subQuery) => {      
+    .select(['posts.id', 'posts.thumbnail', 'posts.title', 'posts.body', 'posts.slug', 'posts.createdAt', 'category.name', 'user.username'])
+    .addSelect((subQuery) => {
       return subQuery
         .select('COUNT(comments.id)', 'commentsCount')
         .from('comments', 'comments')

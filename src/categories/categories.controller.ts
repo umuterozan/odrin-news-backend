@@ -18,7 +18,7 @@ export class CategoriesController {
   }
 
   @Get()
-  async getCategories(@Query('limit') limit: number = 0, @Query('order') order: 'ASC' | 'DESC' = 'ASC') {
-    return await this.categoriesService.find(limit, order);
+  async getCategories(@Query('limit') limit: number = 0, @Query('sort') sort: string = '', @Query('order') order: 'ASC' | 'DESC' = 'ASC') {
+    return await this.categoriesService.find(limit, sort, order);
   }
 }

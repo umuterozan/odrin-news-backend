@@ -3,6 +3,7 @@ import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AccessTokenGuard } from 'src/common/guards';
 import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
+import { PostEntity } from 'src/typeorm/entities';
 
 @Controller('posts')
 export class PostsController {
@@ -19,6 +20,24 @@ export class PostsController {
 
   @Get()
   async getPosts(@Query('limit', ParseIntPipe) limit: number = 0, @Query('sort') sort: string = '', @Query('order') order: 'ASC' | 'DESC' = 'ASC') {
-    return await this.postsService.find(limit, sort, order)
+    const posts = await this.postsService.find(limit, sort, order)
+    return this.formatPosts(posts)
+  }
+
+  formatPosts(posts: PostEntity[]) {
+    const formattedPosts = []
+
+    for (const post of posts) {
+      const { category, user, ...postWithoutProps } = post
+      const formattedPost = {
+        ...postWithoutProps,
+        category: post.category.name,
+        user: post.user.username,
+      }
+
+      formattedPosts.push(formattedPost)
+    }
+
+    return formattedPosts
   }
 }

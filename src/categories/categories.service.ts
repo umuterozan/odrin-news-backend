@@ -20,12 +20,19 @@ export class CategoriesService {
     return await this.categoriesRepository.findOneBy(criteria)
   }
 
-  async find(limit: number, orderType: 'ASC' | 'DESC') {
-    return await this.categoriesRepository.find({
-      take: limit,
-      order: {
-        id: orderType,
-      }
-    })
+  async find(limit: number, sort: string, order: 'ASC' | 'DESC') {
+    return await this.categoriesRepository.createQueryBuilder('categories')
+    .leftJoinAndSelect('categories.posts', 'posts')
+    .select(['categories.id', 'categories.name', 'categories.createdAt' ])
+    .addSelect((subQuery) => {
+      return subQuery
+        .select('COUNT(posts.id)', 'postsCount')
+        .from('posts', 'posts')
+        .where('posts.category.id = categories.id')
+    }, 'count')
+    .orderBy(sort === 'count' ? sort : 'categories.id', order) //burda kaldı
+    .loadRelationCountAndMap('categories.postsCount', 'categories.posts')
+    .take(limit)
+    .getMany();
   }
 }
