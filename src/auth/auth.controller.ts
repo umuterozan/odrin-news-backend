@@ -33,6 +33,12 @@ export class AuthController {
     return await this.authService.logoutAll(userId)
   }
 
+  @UseGuards(AccessTokenGuard)
+  @Get('find-sessions')
+  async findSessions(@GetCurrentUser('sub') userId: number) {
+    return await this.authService.findSessions(userId)
+  }
+
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
   async refreshTokens(@GetCurrentUser('sessionId') sessionId: number, @GetCurrentUser('refreshToken') refreshToken: string) {

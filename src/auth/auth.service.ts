@@ -31,7 +31,10 @@ export class AuthService {
     const hash = await this.hashData(this.sha256(tokens.refreshToken))
     await this.sessionsService.updateRtHash(session.id, hash)
 
-    return tokens;
+    return {
+      username: user.username,
+      ...tokens
+    };
   }
 
   async logoutCurrent(sessionId: number) {
@@ -40,6 +43,10 @@ export class AuthService {
 
   async logoutAll(userId: number) {
     return await this.sessionsService.deleteAllByUserId(userId)
+  }
+
+  async findSessions(userId: number) {
+    return await this.sessionsService.findAll(userId)
   }
 
   async generateTokens(userId: number, username: string, isAdmin: boolean, sessionId: number): Promise<ITokens> {

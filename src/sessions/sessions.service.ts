@@ -31,6 +31,14 @@ export class SessionsService {
     return await this.sessionsRepository.findOneBy(criteria);
   }
 
+  async findAll(userId: number) {
+    return await this.sessionsRepository.createQueryBuilder("sessions")
+    .leftJoinAndSelect("sessions.user", "user")
+    .where("user.id = :userId", {userId})
+    .select(["sessions.id", "sessions.agent", "sessions.createdAt"])
+    .getMany();
+  }
+
   async deleteOneById(id: number) {
     await this.sessionsRepository.delete({ id })
 
