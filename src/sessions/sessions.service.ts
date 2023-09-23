@@ -45,6 +45,17 @@ export class SessionsService {
     return { message: 'successful' }
   }
 
+  async deleteOneByUserId(id: number, userId: number) {
+    await this.sessionsRepository.delete({
+      id,
+      user: {
+        id: userId
+      }
+    })
+
+    return { message: 'successful' }
+  }
+
   async deleteAllByUserId(id: number) {
     await this.sessionsRepository.delete({
       user: {

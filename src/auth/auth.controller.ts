@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Delete, Param } from '@nestjs/common';
 import { SignUpDto, SignInDto } from './dto';
 import { AuthService } from './auth.service';
 import { AccessTokenGuard, RefreshTokenGuard } from 'src/common/guards';
@@ -22,21 +22,31 @@ export class AuthController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Post('logout-current')
+  @Delete('logout-current')
   async logoutCurrent(@GetCurrentUser('sessionId') sessionId: number) {
     return await this.authService.logoutCurrent(sessionId);
   }
 
   @UseGuards(AccessTokenGuard)
-  @Post('logout-all')
+  @Delete('logout-one/:id')
+  async logoutOne(@Param('id') sessionId: number, @GetCurrentUser('sub') userId: number) {
+    return await this.authService.logoutOne(sessionId, userId)
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete('logout-all')
   async logoutAll(@GetCurrentUser('sub') userId: number) {
     return await this.authService.logoutAll(userId)
   }
 
   @UseGuards(AccessTokenGuard)
   @Get('find-sessions')
-  async findSessions(@GetCurrentUser('sub') userId: number) {
-    return await this.authService.findSessions(userId)
+  async findSessions(@GetCurrentUser('sub') userId: number, @GetCurrentUser('sessionId') sessionId: number) {
+    const sessions = await this.authService.findSessions(userId)
+    return {
+      currentSession: sessionId,
+      sessions,
+    }
   }
 
   @UseGuards(RefreshTokenGuard)

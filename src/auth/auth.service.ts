@@ -41,6 +41,10 @@ export class AuthService {
     return await this.sessionsService.deleteOneById(sessionId)
   }
 
+  async logoutOne(sessionId: number, userId: number) {
+    return await this.sessionsService.deleteOneByUserId(sessionId, userId)
+  }
+
   async logoutAll(userId: number) {
     return await this.sessionsService.deleteAllByUserId(userId)
   }
