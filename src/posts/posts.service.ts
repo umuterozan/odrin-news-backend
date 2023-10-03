@@ -19,6 +19,23 @@ export class PostsService {
     return await this.postsRepository.findOneBy(criteria)
   }
 
+  async findOneBySlug(slug: string) {
+    return await this.postsRepository.createQueryBuilder('posts')
+    .leftJoinAndSelect('posts.category', 'category')
+    .leftJoinAndSelect('posts.user', 'user')
+    .leftJoinAndSelect('posts.comments', 'comments')
+    .select(['posts.id', 'posts.thumbnail', 'posts.title', 'posts.body', 'posts.slug', 'posts.createdAt', 'category.name', 'user.username'])
+    .where("posts.slug = :slug", {slug})
+    .addSelect((subQuery) => {
+      return subQuery
+        .select('COUNT(comments.id)', 'commentsCount')
+        .from('comments', 'comments')
+        .where('comments.post.id = posts.id')
+    }, 'count')
+    .loadRelationCountAndMap('posts.commentsCount', 'posts.comments')
+    .getOne()
+  }
+
   async find(limit: number, sort: string, order: 'ASC' | 'DESC') {
     return await this.postsRepository.createQueryBuilder('posts')
     .leftJoinAndSelect('posts.category', 'category')
@@ -31,7 +48,7 @@ export class PostsService {
         .from('comments', 'comments')
         .where('comments.post.id = posts.id')
     }, 'count')
-    .orderBy(sort === 'count' ? sort : 'posts.id', order) //burda kaldı
+    .orderBy(sort === 'count' ? sort : 'posts.id', order)
     .loadRelationCountAndMap('posts.commentsCount', 'posts.comments')
     .take(limit)
     .getMany();

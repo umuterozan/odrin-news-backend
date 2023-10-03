@@ -30,7 +30,7 @@ export class CategoriesService {
         .from('posts', 'posts')
         .where('posts.category.id = categories.id')
     }, 'count')
-    .orderBy(sort === 'count' ? sort : 'categories.id', order) //burda kaldı
+    .orderBy(sort === 'count' ? sort : 'categories.id', order)
     .loadRelationCountAndMap('categories.postsCount', 'categories.posts')
     .take(limit)
     .getMany();

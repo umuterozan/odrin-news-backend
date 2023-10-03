@@ -27,4 +27,14 @@ export class CommentsService {
     return await this.commentsRepository.save(newComment)
   }
 
+  async find(postId: number, limit: number, order: 'ASC' | 'DESC') {
+    return await this.commentsRepository.createQueryBuilder('comments')
+    .leftJoinAndSelect('comments.post', 'post')
+    .leftJoinAndSelect('comments.user', 'user')
+    .select(['comments.id', 'comments.text', 'comments.createdAt', 'user.username'])
+    .where("post.id = :postId", {postId})
+    .orderBy('comments.id', order)
+    .take(limit)
+    .getMany();
+  }
 }
